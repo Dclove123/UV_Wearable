@@ -1,0 +1,75 @@
+/*UV Reader with LEDs
+*/
+int L1 = 9;
+int L2 = 10;
+int L3 = 11;
+int L4 = 12;
+int LED = 13;
+int temp = 0;
+// the setup routine runs once when you press reset:
+void setup() {
+  // initialize serial communication at 9600 bits per second:
+  Serial.begin(9600);
+  pinMode(LED, OUTPUT);
+  pinMode(L1, OUTPUT); 
+  pinMode(L2, OUTPUT);
+  pinMode(L3, OUTPUT);
+  pinMode(L4, OUTPUT);
+}
+
+// the loop routine runs over and over again forever:
+void loop() {
+  // read the input on analog pin 0:
+  int sensorValue = analogRead(A0);
+  // print out the value you read:
+  if(sensorValue > temp)
+  {
+    temp = sensorValue;
+  }
+  else
+  {
+    temp = temp;
+  }
+  if(sensorValue == 0)
+  {
+    digitalWrite(L1, LOW);
+    digitalWrite(L2, LOW);
+    digitalWrite(L3, LOW);
+    digitalWrite(L4, LOW);
+  }
+  else if(sensorValue > 0 && sensorValue <= 50)
+  {
+    digitalWrite(LED, HIGH);
+    digitalWrite(L1, HIGH);
+    digitalWrite(L2, LOW);
+    digitalWrite(L3, LOW);
+    digitalWrite(L4, LOW);
+  }
+  else if(sensorValue > 50 && sensorValue <=100)
+  {
+    digitalWrite(LED, HIGH);
+    digitalWrite(L1, HIGH);
+    digitalWrite(L2, HIGH);
+    digitalWrite(L3, LOW);
+    digitalWrite(L4, LOW);
+  }
+  else if(sensorValue > 100 && sensorValue <= 200)
+  {
+    digitalWrite(LED, HIGH);
+    digitalWrite(L1, HIGH);
+    digitalWrite(L2, HIGH);
+    digitalWrite(L3, HIGH);
+    digitalWrite(L4, LOW);
+  }
+  else
+  {
+    digitalWrite(LED, HIGH);
+    digitalWrite(L1, HIGH);
+    digitalWrite(L2, HIGH);
+    digitalWrite(L3, HIGH);
+    digitalWrite(L4, HIGH);
+  }
+  Serial.println(sensorValue);
+  Serial.println(temp);
+  delay(500);        // delay in between reads for stability
+}
