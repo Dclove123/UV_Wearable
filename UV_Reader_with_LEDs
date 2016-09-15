@@ -1,4 +1,4 @@
-/*UV Reader with LEDs
+/*UV Reader with LEDs Test
 */
 int L1 = 9;
 int L2 = 10;
