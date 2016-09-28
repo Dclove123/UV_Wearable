@@ -1,0 +1,40 @@
+int sensorValue,sensorTotal = 0;
+int pushButton = 6;
+
+void setup() 
+{
+  Serial.begin(9600);
+  pinMode(pushButton,INPUT);
+}
+
+void loop() 
+{
+  if(pushed())
+  {
+    for(int x = 0; x <1000; x++)
+    {
+      sensorValue = analogRead(A4);
+      sensorTotal = sensorTotal + sensorValue;
+    }
+    Serial.println(sensorTotal/1000);
+    sensorTotal = 0;
+    delay(200);
+  }
+  delay(1);
+}
+
+boolean pushed()
+{
+  boolean state = false;
+  int buttonState = digitalRead(pushButton);
+  if(buttonState == 1)
+  {
+    state = true;
+  }
+  else
+  {
+    state = false;
+  }
+  return state;
+}
+
