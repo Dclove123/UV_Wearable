@@ -1,0 +1,127 @@
+#include <SPI.h>
+#include <Wire.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
+
+#define OLED_RESET 4
+Adafruit_SSD1306 display(OLED_RESET);
+
+#define NUMFLAKES 10
+#define XPOS 0
+#define YPOS 1
+#define DELTAY 2
+
+int8_t lastTemp = 0;
+
+#define LOGO16_GLCD_HEIGHT 16 
+#define LOGO16_GLCD_WIDTH  16 
+static const unsigned char PROGMEM logo16_glcd_bmp[] =
+{ B00000000, B11000000,
+  B00000001, B11000000,
+  B00000001, B11000000,
+  B00000011, B11100000,
+  B11110011, B11100000,
+  B11111110, B11111000,
+  B01111110, B11111111,
+  B00110011, B10011111,
+  B00011111, B11111100,
+  B00001101, B01110000,
+  B00011011, B10100000,
+  B00111111, B11100000,
+  B00111111, B11110000,
+  B01111100, B11110000,
+  B01110000, B01110000,
+  B00000000, B00110000 };
+
+#if (SSD1306_LCDHEIGHT != 64)
+//#error("Height incorrect, please fix Adafruit_SSD1306.h!");
+#endif
+
+long sensorValue,sensorTotal = 0; //Long because as ints they were overflowed
+int pushButton = 6; //Sets the pin that the button sends data to
+
+void setup()   
+{                
+  Serial.begin(9600);
+  //pinMode(pushButton,INPUT);  //Initializes pin with value pushButton as INPUT
+
+  // by default, we'll generate the high voltage from the 3.3v line internally! (neat!)
+  display.begin(SSD1306_SWITCHCAPVCC, 0x3C);  // initialize with the I2C addr 0x3D (for the 128x64)
+  // init done
+  
+  // Show image buffer on the display hardware.
+  // Since the buffer is intialized with an Adafruit splashscreen
+  // internally, this will display the splashscreen.
+  display.display();
+  delay(2000);
+
+  // Clear the buffer.
+  display.clearDisplay();
+
+  // drawing shapes
+  //  display.drawPixel(10, 10, WHITE);
+  //  display.drawLine(0, 0, i, display.height()-1, WHITE); 
+  //
+  //  display.fillRect(i, i, display.width()-i*2, display.height()-i*2, color%2);
+  //  display.drawTriangle(display.width()/2, display.height()/2-i,
+  //                     display.width()/2-i, display.height()/2+i,
+  //                     display.width()/2+i, display.height()/2+i, WHITE);
+  //  display.fillCircle(display.width()/2, display.height()/2, 10, WHITE); 
+  //    display.startscrollright(0x00, 0x0F);
+
+
+  /*text display tests
+  display.setTextSize(1);
+  display.setTextColor(WHITE);
+  display.setCursor(0,0);
+  display.println("Hello, world!");
+  display.setTextColor(BLACK, WHITE); // 'inverted' text
+  display.println(3.141592);
+  display.setTextSize(2);
+  display.setTextColor(WHITE);
+  display.print("0x"); display.println(0xDEADBEEF, HEX);
+  display.display();
+  display.clearDisplay();*/
+  display.setTextSize(1);
+  display.setTextColor(WHITE);
+  display.setCursor(0,0);
+}
+
+
+void loop() 
+{
+  //display.println("test");
+  display.setCursor(0,0);
+  if(pushed())  //If pushed() returns true it will complete the statement
+  {
+    display.clearDisplay();
+    display.display();
+    for(int x = 0; x <1000; x++)//Runs a for loop 1000 times
+    {
+      sensorValue = analogRead(A0); //Collects data from the Analog pin 4
+      sensorTotal = sensorTotal + sensorValue;  //Adds the UV value to sensorTotal to get the sum of a 1000 data points
+      //Serial.println(sensorValue); //Debugging by printing out every data point
+      delay(1); //Delay for stability
+    }
+    display.print(sensorTotal/1000); //Prints the average of the 100 data points
+    display.display();
+    sensorTotal = 0;  //Resets the sum of all the data points to 0
+    delay(200); //Delay to prevent button spamming and mixed results.
+  }
+  delay(1); //Delay for stability
+}
+
+boolean pushed()
+{
+  boolean state = false;  //Resets the return to false
+  int buttonState = digitalRead(pushButton);  //Reads the state of the button once function is run
+  if(buttonState == 1)  //If button is pressed statement if fulfilled
+  {
+    state = true; //Sets return statement as true
+  }
+  else
+  {
+    state = false;  //Sets return statement as false
+  }
+  return state; //Returns state
+}
